@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>开放世界点云概念树 · 交互浏览器</title>
+<style>
+:root{--bg:#0f1115;--panel:#1a1d24;--border:#2a2e38;--fg:#e8eaf0;--muted:#8a91a0;--acc:#4da3ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--fg);display:flex;height:100vh}
+#treePane{width:44%;min-width:380px;border-right:1px solid var(--border);display:flex;flex-direction:column}
+#detailPane{flex:1;overflow:auto;padding:24px;background:var(--panel)}
+header{padding:14px 18px;border-bottom:1px solid var(--border)}
+header h1{font-size:17px;margin:0 0 8px}
+header p{font-size:12px;color:var(--muted);margin:0}
+#search{padding:10px 14px;border-bottom:1px solid var(--border)}
+#search input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);
+  background:#12151b;color:var(--fg);font-size:13px;outline:none}
+#tree{flex:1;overflow:auto;padding:10px 12px;font-size:13px}
+ul{list-style:none;margin:0;padding-left:16px;border-left:1px solid #23262e}
+ul.root{padding-left:0;border-left:none}
+li{margin:1px 0}
+.nrow{display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.nrow:hover{background:#232733}
+.nrow.sel{background:#26303f}
+.tw{cursor:pointer;width:16px;color:var(--muted);user-select:none}
+.lbl{font-weight:600}
+.badge{font-size:10px;padding:1px 6px;border-radius:8px;background:#26304a;color:#8fb7ff}
+.badge.leaf{background:#233a2e;color:#7fd69a}
+.sz{color:var(--muted);font-size:11px}
+.concept{color:#c9a86a;font-size:11px;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+/* detail */
+#detailPane h2{margin:0 0 4px;font-size:20px}
+.meta{color:var(--muted);font-size:13px;margin-bottom:16px}
+.card{background:#1f232c;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:var(--acc);text-transform:uppercase;letter-spacing:.5px}
+.bar{display:flex;height:20px;border-radius:5px;overflow:hidden;margin:6px 0}
+.seg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;min-width:0}
+.tag{display:inline-block;background:#232733;border:1px solid var(--border);border-radius:6px;
+  padding:3px 9px;margin:3px 4px 0 0;font-size:12px}
+img.nodeimg{width:100%;max-width:340px;border-radius:8px;background:#000;border:1px solid var(--border)}
+.desc{font-size:14px;line-height:1.7;color:#cfe0f5}
+.pair{display:flex;justify-content:space-between;border-bottom:1px dashed #262a33;padding:5px 0;font-size:13px}
+.pair b{color:#7fd6c3}
+#tree::-webkit-scrollbar,#detailPane::-webkit-scrollbar{width:8px}
+#tree::-webkit-scrollbar-thumb{background:#2c3140;border-radius:4px}
+</style></head><body>
+<div id="treePane">
+  <header>
+    <h1>🌳 开放世界点云概念树</h1>
+    <p>自监督预训练 → UMAP → 递归 HDBSCAN → 概念节点 · 点击节点查看详情</p>
+  </header>
+  <div id="search"><input id="q" placeholder="搜索类名 / 概念名 / 节点id…" oninput="onSearch(this.value)"></div>
+  <div id="tree"></div>
+</div>
+<div id="detailPane"><div id="empty" style="color:var(--muted);margin-top:80px;text-align:center">
+  ← 在左侧选择一个概念节点<br><br>每个节点都有：成员 RGB 原图 · 类分布 · 物理概念 · 语言描述</div>
+  <div id="detail" style="display:none"></div></div>
+
+<script>
+let DATA = null, nodes = {};
+fetch('data/tree_demo.json').then(r=>r.json()).then(d=>{
+  DATA = d; nodes = d.nodes;
+  buildTree();
+  // 默认选中根
+  select('0');
+});
+
+function childrenOf(id){
+  return Object.values(nodes).filter(n=>String(n.parent)===String(id))
+    .sort((a,b)=>b.size-a.size);
+}
+function rowHTML(n){
+  const hasKids = childrenOf(n.id).length>0;
+  return (hasKids?'<span class="tw" onclick="toggle(event,this)">▸</span>':'<span class="tw"></span>')
+    + `<span class="lbl">${esc(n.label||'')}</span>`
+    + (n.concept?`<span class="concept" title="${esc(n.concept)}">${esc(n.concept)}</span>`:'')
+    + `<span class="sz">${n.size}</span>`
+    + (n.leaf?'<span class="badge leaf">叶</span>':'<span class="badge">簇</span>');
+}
+function buildTree(){
+  const root = document.getElementById('tree');
+  root.innerHTML = '';
+  // 根节点自身也渲染成一行
+  const n0 = nodes['0'];
+  if(n0){
+    const r = document.createElement('div');
+    r.className='nrow'; r.id='r0';
+    r.innerHTML = rowHTML(n0);
+    r.onclick = ()=>select('0');
+    root.appendChild(r);
+  }
+  root.appendChild(nodeUL('0', true));
+}
+function nodeUL(id, isRoot){
+  const ul = document.createElement('ul');
+  if(isRoot) ul.className='root';
+  for(const c of childrenOf(id)){
+    const li = document.createElement('li');
+    const n = nodes[c.id];
+    const row = document.createElement('div');
+    row.className='nrow'; row.id='r'+n.id;
+    row.innerHTML = rowHTML(n);
+    row.onclick = ()=>select(n.id);
+    li.appendChild(row);
+    const hasKids = childrenOf(n.id).length>0;
+    if(hasKids){
+      const sub = nodeUL(n.id,false);
+      sub.style.display='none';
+      li.appendChild(sub);
+    }
+    ul.appendChild(li);
+  }
+  return ul;
+}
+function toggle(ev,el){
+  ev.stopPropagation();
+  const sub = el.parentElement.nextElementSibling;
+  if(!sub) return;
+  const open = sub.style.display!=='none';
+  sub.style.display = open?'none':'block';
+  el.textContent = open?'▸':'▾';
+}
+function select(id){
+  // 高亮
+  document.querySelectorAll('.nrow.sel').forEach(x=>x.classList.remove('sel'));
+  const r = document.getElementById('r'+id); if(r) r.classList.add('sel');
+  const n = nodes[id]; if(!n) return;
+  const detail = document.getElementById('detail');
+  const empty = document.getElementById('empty');
+  empty.style.display='none'; detail.style.display='block';
+  // 类分布条
+  const total = n.top.reduce((a,b)=>a+b[1],0)||1;
+  const colors = ['#4da3ff','#7fd69a','#c9a86a','#e07b7b'];
+  const bars = n.top.map((t,i)=>`<div class="seg" style="width:${t[1]/total*100}%;background:${colors[i%4]}" title="${esc(t[0])}: ${t[1]}">${esc(t[0].split(':').pop())}</div>`).join('');
+  detail.innerHTML = `
+    <h2>${esc(n.label)}</h2>
+    <div class="meta">节点 #${n.id} · 深度 ${n.depth} · ${n.size} 样本 · 纯度 ${n.purity}
+      ${n.leaf?'· 概念叶':'· 内部簇'}${n.tightness!=null?` · 物理紧密度 ${n.tightness}`:''}</div>
+    ${n.img?`<div class="card"><h3>成员 RGB 原图</h3><img class="nodeimg" src="${n.img}"></div>`:''}
+    <div class="card"><h3>类分布</h3><div class="bar">${bars||'—'}</div></div>
+    <div class="card"><h3>物理概念</h3>
+      <div class="pair"><span>概念名</span><b>${esc(n.concept||'—')}</b></div>
+      <div class="pair"><span>最紧属性</span><b>${esc(n.def_prop||'—')}</b></div>
+      <div class="pair"><span>紧密度</span><b>${n.tightness!=null?n.tightness:'—'}</b></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">紧密度 = 最小相对方差；越小说明该节点被一个物理属性强定义</div></div>
+    ${n.attr?`<div class="card"><h3>语言描述 (CLIP)</h3><div class="desc">${esc(n.attr)}</div></div>`:''}`;
+}
+function onSearch(v){
+  v=v.trim().toLowerCase();
+  document.querySelectorAll('.nrow').forEach(row=>{
+    const n = nodes[row.id.slice(1)];
+    const hit = !v || (n.label&&n.label.toLowerCase().includes(v))
+      || (n.concept&&n.concept.toLowerCase().includes(v))
+      || (n.def_prop&&n.def_prop.toLowerCase().includes(v))
+      || n.id===Number(v);
+    row.style.display = hit?'':'none';
+    // 命中时展开祖先
+    if(hit && v){
+      let p = row.parentElement; 
+      while(p && p.tagName==='UL'){ p.style.display='block'; p=p.parentElement?.parentElement; }
+    }
+  });
+}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+</script>
+</body></html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>开放世界 3D 点云概念树 · 项目 Demo</title>
+<style>
+:root{--bg:#0f1115;--panel:#1a1d24;--border:#2a2e38;--fg:#e8eaf0;--muted:#8a91a0;--acc:#4da3ff;--ok:#7fd69a}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--fg);line-height:1.7}
+.hero{text-align:center;padding:60px 20px 40px;background:radial-gradient(1200px 400px at 50% -50%,#1c2a42,transparent)}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero .tag{font-size:15px;color:var(--muted);max-width:760px;margin:0 auto}
+.container{max-width:960px;margin:0 auto;padding:0 20px 60px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin:18px 0}
+.card h2{margin:0 0 12px;font-size:19px;color:var(--acc)}
+.pipe{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:13px;margin:14px 0}
+.pipe span{background:#232733;border:1px solid var(--border);border-radius:20px;padding:6px 14px}
+.pipe .a{color:var(--muted)}
+.cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:24px 0}
+.btn{display:inline-block;padding:14px 26px;border-radius:12px;text-decoration:none;font-size:15px;font-weight:600}
+.btn.p{background:var(--acc);color:#0b1220}.btn.s{background:#232733;border:1px solid var(--border);color:var(--fg)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{border:1px solid var(--border);padding:8px 10px;text-align:left}
+th{background:#212631;color:var(--acc)}
+.hl{color:#ffd479}.ok{color:var(--ok)}
+.muted{color:var(--muted);font-size:13px}
+ol li{margin:6px 0}
+</style></head><body>
+<div class="hero">
+  <h1>🌳 开放世界 3D 点云概念树</h1>
+  <p class="tag">不靠人工标注，从无标签点云中自动学习一棵<b>可解释的概念树</b>——
+  让机器不仅能分类，还能<b>描述物体、归纳概念、认识从未见过的东西</b></p>
+  <div class="cta">
+    <a class="btn p" href="ood.html">🔍 认识未见物体（OOD Demo）</a>
+    <a class="btn s" href="tree.html">🌳 交互式概念树浏览器</a>
+  </div>
+</div>
+<div class="container">
+
+<div class="card">
+  <h2>系统流程</h2>
+  <div class="pipe">
+    <span>ARID + ScanNet 点云<br><span class="a">52520 实例 / 633 类</span></span><span class="a">→</span>
+    <span>Point-CMAE + VICReg<br><span class="a">自监督预训练 (γ=1.0)</span></span><span class="a">→</span>
+    <span>256D 特征<br><span class="a">UMAP 30D</span></span><span class="a">→</span>
+    <span>递归 HDBSCAN<br><span class="a">概念树</span></span><span class="a">→</span>
+    <span>可解释层<br><span class="a">物理描述 + CLIP 语言</span></span>
+  </div>
+  <p class="muted">全程无监督：聚类、建树、命名、认识新物体都不需要人工标注。</p>
+</div>
+
+<div class="card">
+  <h2>核心能力与结果</h2>
+  <table>
+    <tr><th>能力</th><th>结果</th></tr>
+    <tr><td>概念路由</td><td>test 准确率 <b>0.53</b>（随机基线 1.6%，即 33×）</td></tr>
+    <tr><td>认识未见物体</td><td class="ok">armchair → 正确归入 chair 概念，CLIP 描述出 <b>"has a seat"</b></td></tr>
+    <tr><td>概念抽象</td><td>独特类抽象良好：apple 同类汇合 <b class="hl">0.92</b>、chair 1.00</td></tr>
+    <tr><td>可解释性</td><td>每节点：成员 RGB 原图 + 类分布 + 物理概念 + 语言描述</td></tr>
+    <tr><td>UMAP 30D 改进</td><td>同类叶汇合率 <b class="hl">翻倍</b>（0.17→0.33）、路由 0.524→0.530</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>技术亮点</h2>
+  <ol>
+    <li><b>自监督预训练</b>：Point-CMAE 双掩码重建 + VICReg 分布正则（γ 目标方差 0.5→1.0 让特征更分散）</li>
+    <li><b>概念树 = 概念抽象，不是类聚类</b>：苹果碎片应抽象进"水果"概念而非"纯苹果簇"——为此纠正了评估框架（同类叶 LCA → 概念包含率）</li>
+    <li><b>物理描述子定义概念</b>：12 维确定性描述子（形状/尺度/朝向/颜色），属性方差小 = 该属性即概念 → 自动识别重复分支（孪生分支 cos 0.93）</li>
+    <li><b>开放世界理解</b>：近义类 OOD 泛化极好（towels→towel、dining table→table）；新颖类给出诚实的"物理概念 + 归属区域"</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>如何体验</h2>
+  <ol>
+    <li><b>认识未见物体</b>：打开 <a href="ood.html" style="color:var(--acc)">ood.html</a>，切换下拉选择 7 个训练集外物体，看系统如何"理解"它们</li>
+    <li><b>概念树浏览器</b>：打开 <a href="tree.html" style="color:var(--acc)">tree.html</a>，展开概念树、点任意节点看成员/类分布/物理概念/语言描述</li>
+  </ol>
+  <p class="muted">技术细节、数据与诚实复盘见仓库 README 与 docs/。</p>
+</div>
+
+</div>
+</body></html>

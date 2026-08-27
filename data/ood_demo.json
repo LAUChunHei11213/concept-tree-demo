@@ -1,0 +1,342 @@
+[
+ {
+  "cls": "ScanNet:armchair",
+  "row": 14655,
+  "leaf_id": 2501,
+  "leaf_label": "ScanNet:chair",
+  "dist": 0.09281652420759201,
+  "path": [
+   [
+    2501,
+    "ScanNet:chair",
+    5
+   ],
+   [
+    2500,
+    "ScanNet:chair",
+    4
+   ],
+   [
+    2415,
+    "ScanNet:chair",
+    3
+   ],
+   [
+    1961,
+    "ScanNet:chair",
+    2
+   ],
+   [
+    0,
+    "ScanNet:chair",
+    1
+   ]
+  ],
+  "attr_desc": "compact · orange · large · leather · has a seat",
+  "physics": {
+   "elongation": 2.8817366326741047,
+   "flatness": 2.5825857887617403,
+   "sphericity": 0.12041800431964587,
+   "anisotropy": 0.8795819956803541,
+   "planarity": 0.6827399024799408,
+   "scale": 0.45526553639819084,
+   "extent": 0.3282540631876148,
+   "verticality": 0.18143169630491046,
+   "saturation": 0.13302313112745096,
+   "brightness": 0.23222783905228758,
+   "hue_std": 0.7178433685300089,
+   "radial_cv": 0.2959540296240668
+  },
+  "img": "assets/ood_armchair.png"
+ },
+ {
+  "cls": "ScanNet:dining table",
+  "row": 15163,
+  "leaf_id": 4578,
+  "leaf_label": "ScanNet:table",
+  "dist": 0.07649748772382736,
+  "path": [
+   [
+    4578,
+    "ScanNet:table",
+    5
+   ],
+   [
+    4577,
+    "ScanNet:table",
+    4
+   ],
+   [
+    4535,
+    "ScanNet:table",
+    3
+   ],
+   [
+    4351,
+    "ScanNet:table",
+    2
+   ],
+   [
+    0,
+    "ScanNet:chair",
+    1
+   ]
+  ],
+  "attr_desc": "box-shaped · white · large · glass · is reflective",
+  "physics": {
+   "elongation": 4.747247762107874,
+   "flatness": 1.6114067245776207,
+   "sphericity": 0.044372735510838104,
+   "anisotropy": 0.9556272644891619,
+   "planarity": 0.07084691311559395,
+   "scale": 1.3514983081150995,
+   "extent": 1.255055205027937,
+   "verticality": 0.03962798120866971,
+   "saturation": 0.10154335171568626,
+   "brightness": 0.5092843647875818,
+   "hue_std": 1.6909035235185712,
+   "radial_cv": 0.4310484209751369
+  },
+  "img": "assets/ood_dining_table.png"
+ },
+ {
+  "cls": "ScanNet:towels",
+  "row": 19762,
+  "leaf_id": 5841,
+  "leaf_label": "ScanNet:window",
+  "dist": 0.3554475009441376,
+  "path": [
+   [
+    5841,
+    "ScanNet:window",
+    4
+   ],
+   [
+    5812,
+    "ScanNet:lamp",
+    3
+   ],
+   [
+    4653,
+    "ScanNet:object",
+    2
+   ],
+   [
+    0,
+    "ScanNet:chair",
+    1
+   ]
+  ],
+  "attr_desc": "conical · colorful · long · wood · has a spout",
+  "physics": {
+   "elongation": 6.941946961950964,
+   "flatness": 2.286254775380715,
+   "sphericity": 0.020750922935319275,
+   "anisotropy": 0.9792490770646807,
+   "planarity": 0.08771333984399174,
+   "scale": 0.36409815978844,
+   "extent": 0.3426337417263039,
+   "verticality": 0.8818856998461583,
+   "saturation": 0.23017003676470588,
+   "brightness": 0.5902113970588234,
+   "hue_std": 1.3799098173840314,
+   "radial_cv": 0.5211591592414061
+  },
+  "img": "assets/ood_towels.png"
+ },
+ {
+  "cls": "ScanNet:kitchenaid mixer",
+  "row": 50438,
+  "leaf_id": 2174,
+  "leaf_label": "ARID:hand_towel",
+  "dist": 0.06756652891635895,
+  "path": [
+   [
+    2174,
+    "ARID:hand_towel",
+    5
+   ],
+   [
+    2161,
+    "ScanNet:chair",
+    4
+   ],
+   [
+    2046,
+    "ScanNet:shelf",
+    3
+   ],
+   [
+    1961,
+    "ScanNet:chair",
+    2
+   ],
+   [
+    0,
+    "ScanNet:chair",
+    1
+   ]
+  ],
+  "attr_desc": "conical · colorful · tall · cloth · is stackable",
+  "physics": {
+   "elongation": 2.227149651503334,
+   "flatness": 1.6826393816310692,
+   "sphericity": 0.20160495404849696,
+   "anisotropy": 0.798395045951503,
+   "planarity": 0.3691941704115338,
+   "scale": 0.1466334760632744,
+   "extent": 0.11014169600389438,
+   "verticality": 0.5178782588347938,
+   "saturation": 0.07558210784313726,
+   "brightness": 0.3945503982843137,
+   "hue_std": 0.8413444396126826,
+   "radial_cv": 0.35780096984532334
+  },
+  "img": "assets/ood_kitchenaid_mixer.png"
+ },
+ {
+  "cls": "ScanNet:ping pong paddle",
+  "row": 22730,
+  "leaf_id": 2206,
+  "leaf_label": "ScanNet:picture",
+  "dist": 0.39953112602233887,
+  "path": [
+   [
+    2206,
+    "ScanNet:picture",
+    4
+   ],
+   [
+    2205,
+    "ARID:keyboard",
+    3
+   ],
+   [
+    1961,
+    "ScanNet:chair",
+    2
+   ],
+   [
+    0,
+    "ScanNet:chair",
+    1
+   ]
+  ],
+  "attr_desc": "elongated · pink · tiny · cloth · is soft",
+  "physics": {
+   "elongation": 13.900524781884698,
+   "flatness": 6.476413271975184,
+   "sphericity": 0.0051753247559186925,
+   "anisotropy": 0.9948246752440812,
+   "planarity": 0.21189812868246416,
+   "scale": 0.0661124896939012,
+   "extent": 0.05980034732708639,
+   "verticality": 0.009219997270589735,
+   "saturation": 0.45453814338235293,
+   "brightness": 0.42569955065359477,
+   "hue_std": 0.10355909115616359,
+   "radial_cv": 0.4425786235659914
+  },
+  "img": "assets/ood_ping_pong_paddle.png"
+ },
+ {
+  "cls": "ScanNet:paper towel dispenser",
+  "row": 14680,
+  "leaf_id": 2837,
+  "leaf_label": "ScanNet:chair",
+  "dist": 0.11872124671936035,
+  "path": [
+   [
+    2837,
+    "ScanNet:chair",
+    5
+   ],
+   [
+    2832,
+    "ScanNet:chair",
+    4
+   ],
+   [
+    2769,
+    "ScanNet:chair",
+    3
+   ],
+   [
+    1961,
+    "ScanNet:chair",
+    2
+   ],
+   [
+    0,
+    "ScanNet:chair",
+    1
+   ]
+  ],
+  "attr_desc": "elongated · shiny · long · wood · is reflective",
+  "physics": {
+   "elongation": 3.0623422794137225,
+   "flatness": 1.1472971861719266,
+   "sphericity": 0.10663322380012952,
+   "anisotropy": 0.8933667761998706,
+   "planarity": 0.03372711122366055,
+   "scale": 0.31291424633392534,
+   "extent": 0.2802161946416078,
+   "verticality": 0.19185491787100334,
+   "saturation": 0.03983609068627451,
+   "brightness": 0.3559117136437908,
+   "hue_std": 1.6974061900623174,
+   "radial_cv": 0.9363722816894388
+  },
+  "img": "assets/ood_paper_towel_dispenser.png"
+ },
+ {
+  "cls": "ScanNet:mail",
+  "row": 19636,
+  "leaf_id": 5453,
+  "leaf_label": "ScanNet:lamp",
+  "dist": 0.23954911530017853,
+  "path": [
+   [
+    5453,
+    "ScanNet:lamp",
+    5
+   ],
+   [
+    5452,
+    "ScanNet:doorframe",
+    4
+   ],
+   [
+    5367,
+    "ScanNet:object",
+    3
+   ],
+   [
+    4653,
+    "ScanNet:object",
+    2
+   ],
+   [
+    0,
+    "ScanNet:chair",
+    1
+   ]
+  ],
+  "attr_desc": "flat · white · medium-sized · cloth · is soft",
+  "physics": {
+   "elongation": 5.563676156046652,
+   "flatness": 3.734687437276431,
+   "sphericity": 0.03230548858846006,
+   "anisotropy": 0.96769451141154,
+   "planarity": 0.4182879208500889,
+   "scale": 0.12172762282560472,
+   "extent": 0.09996163931451821,
+   "verticality": 0.043528948782079316,
+   "saturation": 0.05070082720588236,
+   "brightness": 0.7401322508169935,
+   "hue_std": 2.5795004045920003,
+   "radial_cv": 0.37201763886208045
+  },
+  "img": "assets/ood_mail.png"
+ }
+]

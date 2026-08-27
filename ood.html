@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>认识从未见过的物体 · OOD 概念画像</title>
+<style>
+:root{--bg:#0f1115;--panel:#1a1d24;--border:#2a2e38;--fg:#e8eaf0;--muted:#8a91a0;--acc:#4da3ff;--ok:#7fd69a;--warn:#e0c06a}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--fg);padding:32px;max-width:960px;margin:0 auto}
+h1{font-size:24px;margin:0 0 6px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:24px;line-height:1.7}
+.tip{background:#1d2230;border:1px solid var(--border);border-radius:10px;padding:10px 14px;
+  font-size:13px;color:#a9c6e8;margin-bottom:20px}
+select{padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:#12151b;
+  color:var(--fg);font-size:14px;margin-bottom:24px;min-width:280px}
+.layout{display:flex;gap:24px;flex-wrap:wrap}
+.visual{flex:1;min-width:280px}
+.visual img{width:100%;border-radius:10px;background:#000;border:1px solid var(--border)}
+.info{flex:1.4;min-width:340px}
+.card{background:#1f232c;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:var(--acc);text-transform:uppercase;letter-spacing:.5px}
+.path{font-size:13px;line-height:1.9}
+.path .node{background:#232733;border:1px solid var(--border);border-radius:6px;padding:2px 8px;margin:2px;display:inline-block}
+.path .arrow{color:var(--muted);margin:0 2px}
+.attr{font-size:16px;color:#cfe0f5;line-height:1.8}
+.attr b{color:#7fd6c3}
+.verdict{margin-top:6px;font-size:13px}
+.verdict.ok{color:var(--ok)} .verdict.warn{color:var(--warn)}
+.pair{display:flex;justify-content:space-between;border-bottom:1px dashed #262a33;padding:5px 0;font-size:13px}
+.pair b{color:#7fd6c3}
+.hl{color:#ffd479}
+</style></head><body>
+<h1>🔍 认识从未见过的物体</h1>
+<div class="sub">以下物体 <b class="hl">从未出现在训练集</b>（ScanNet 61 类之外）。系统仅用已学到的概念树 + 物理描述 + CLIP 语言先验，为它们生成"概念画像"。</div>
+<div class="tip">💡 关键点：这不是"分类"——系统没有这些类，而是 <b>用已知概念去理解未知物体</b>：
+近义类（扶手椅→椅子）被正确归纳；新颖类则给出诚实的"物理概念 + 归属区域"。</div>
+<select id="sel"></select>
+<div class="layout">
+  <div class="visual">
+    <div class="card" style="padding:0;overflow:hidden"><img id="img" src=""></div>
+    <div class="card"><h3>命中概念叶</h3>
+      <div class="pair"><span>叶节点</span><b id="leaf"></b></div>
+      <div class="pair"><span>叶多数类</span><b id="leafLabel"></b></div>
+      <div class="pair"><span>路由距离</span><b id="dist"></b></div>
+      <div id="verdict" class="verdict"></div>
+    </div>
+  </div>
+  <div class="info">
+    <div class="card"><h3>树路径（叶 → 根）</h3><div id="path" class="path"></div></div>
+    <div class="card"><h3>语言描述（CLIP 属性投影）</h3><div id="attr" class="attr"></div></div>
+    <div class="card"><h3>物理描述子</h3><div id="phys"></div></div>
+  </div>
+</div>
+
+<script>
+let OOD = [];
+fetch('data/ood_demo.json').then(r=>r.json()).then(d=>{
+  OOD = d;
+  const sel = document.getElementById('sel');
+  d.forEach((o,i)=>{ const opt=document.createElement('option'); opt.value=i;
+    opt.textContent = o.cls + (o.attr_desc?' — "'+o.attr_desc+'"':''); sel.appendChild(opt); });
+  show(0);
+});
+document.getElementById('sel').onchange = e=>show(+e.target.value);
+
+function show(i){
+  const o = OOD[i];
+  document.getElementById('img').src = o.img;
+  document.getElementById('leaf').textContent = '#'+o.leaf_id;
+  document.getElementById('leafLabel').textContent = o.leaf_label;
+  document.getElementById('dist').textContent = o.dist.toFixed(3);
+  // 路径
+  document.getElementById('path').innerHTML = o.path.map((p,j)=>
+    (j?'<span class="arrow">←</span>':'')+`<span class="node">#${p[0]} ${esc(p[1])} <small style="color:var(--muted)">d${p[2]}</small></span>`).join('');
+  // CLIP
+  const parts = o.attr_desc.split('·').map(s=>s.trim());
+  document.getElementById('attr').innerHTML = parts.map(s=>`<b>${esc(s)}</b>`).join(' · ');
+  // 物理
+  const P = o.physics;
+  const names = {elongation:'长扁比',flatness:'扁平度',sphericity:'球形度',anisotropy:'各向异性',
+    planarity:'平面性',scale:'尺度(m)',extent:'跨度(m)',verticality:'竖直占比',saturation:'饱和度',
+    brightness:'亮度',hue_std:'色彩多样性',radial_cv:'径向均匀'};
+  document.getElementById('phys').innerHTML = Object.entries(P)
+    .map(([k,v])=>`<div class="pair"><span>${names[k]||k}</span><b>${v.toFixed(2)}</b></div>`).join('');
+  // 判定
+  const near = o.cls.toLowerCase().includes(o.leaf_label.split(':').pop().toLowerCase());
+  const v = document.getElementById('verdict');
+  v.className = 'verdict ' + (near?'ok':'warn');
+  v.innerHTML = near
+    ? '✅ 近义泛化：该物体被正确归入同族概念（树认识到了它的本质）'
+    : '⚠️ 新颖物体：归入最近概念区域（物理画像可靠；叶级标签/CLIP 为软性推测）';
+}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+</script>
+</body></html>
